@@ -1,4 +1,4 @@
-RegERM.jl
-=========
+RegERMs.jl
+==========
 
-Regularised Risk Minimisation Framework (SVMs,  LogReg, Linear Regression) in Julia
+Regularised empirical risk minimisation framework (SVMs,  LogReg, Linear Regression) in Julia.

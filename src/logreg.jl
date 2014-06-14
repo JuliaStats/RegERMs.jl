@@ -20,5 +20,6 @@ function LogReg(X::Matrix, y::Vector, λ::Float64)
 end
 
 modelname(::LogReg) = "Logistic Regression"
-losses{T<:Real}(logreg::LogReg, w::Vector{T}) = logistic(logreg, w)
-regularizer{T<:Real}(logreg::LogReg, w::Vector{T}) = l2reg(w, logreg.λ)
+losses(logreg::LogReg, w::Vector) = Logistic(w, logreg.X, logreg.y)
+losses(logreg::LogReg, w::Vector, i::Int) = Logistic(w, logreg.X[i,:], [logreg.y[i]])
+regularizer(logreg::LogReg, w::Vector) = L2reg(w, logreg.λ)

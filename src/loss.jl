@@ -1,27 +1,59 @@
-# logistic loss: corresponds to likelihood under an exponential family assumption
-function logistic{T<:Real}(model::RegERM, w::Vector{T})
-    f = model.X*w
-    losses  = log(1.+exp(-model.y.*f))
-    gradient = -model.y.*model.X ./ (1 .+ exp(model.y.*f))
+export Loss, Logistic, Squared, Hinge, value, gradient
 
-    (losses, gradient)
+abstract Loss
+
+## logistic loss: correspond to likelihood under an exponential family assumption
+
+immutable Logistic <: Loss
+    w::Vector
+    X::Matrix
+    y::Vector
 end
 
-# squared loss
-function squared{T<:Real}(model::RegERM, w::Vector{T})
-    f = model.X*w
-    losses = norm(f - model.y)^2 / 2
-    gradient = f - model.y
-
-    (losses, gradient)
+function value(l::Logistic) 
+    f = l.X*l.w
+    log(1.+exp(-l.y.*f))
+end
+function gradient(l::Logistic) 
+    f = l.X*l.w
+    g = -l.y.*l.X ./ (1 .+ exp(l.y.*f))
+    g'
 end
 
-# hinge loss
-function hinge{T<:Real}(model::RegERM, w::Vector{T})
-    f = model.X*w
-    losses = max(0, 1.-model.y.*f)
-    gradient = -model.y.*(losses .> 0)
 
-    (losses, gradient)
+## squared loss
+
+immutable Squared <: Loss
+    w::Vector
+    X::Matrix
+    y::Vector
 end
 
+function value(l::Squared) 
+    f = l.X*l.w
+    (f - l.y).^2 / 2
+end
+function gradient(l::Squared) 
+    f = l.X*l.w
+    g = l.X.*(f - l.y)
+    g'
+end
+
+
+## hinge loss: correspond to max-margin assumption
+
+immutable Hinge <: Loss
+    w::Vector
+    X::Matrix
+    y::Vector
+end
+
+function value(l::Hinge) 
+    f = l.X*l.w
+    max(0, 1.-l.y.*f)
+end
+function gradient(l::Hinge) 
+    h = value(l)
+    g = -l.y.*l.X.*(h .> 0)
+    g'
+end

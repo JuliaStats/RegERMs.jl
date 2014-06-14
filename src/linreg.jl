@@ -17,18 +17,17 @@ function LinReg(X::Matrix, y::Vector, λ::Float64)
 end
 
 modelname(::LinReg) = "Linear Regression"
-losses{T<:Real}(linreg::LinReg, w::Vector{T}) = squared(linreg, w)
-regularizer{T<:Real}(linreg::LinReg, w::Vector{T}) = l2reg(w, linreg.λ)
+losses(linreg::LinReg, w::Vector) = Squared(w, linreg.X, linreg.y)
+losses(linreg::LinReg, w::Vector, i::Int) = Squared(w, linreg.X[i,:], [linreg.y[i]])
+regularizer(linreg::LinReg, w::Vector) = L2reg(w, linreg.λ)
 
 # closed-form solution
-function optimize(linreg::LinReg; method=:closed_form)
+function optimize(linreg::LinReg, method=:closed_form)
 	if method == :closed_form
 		X = linreg.X
 		y = linreg.y
 		(X'*X + eye(linreg.m)/linreg.λ)\X'*y
-	elseif method == :lbfgs
-		RegERMs.optimize(linreg)
 	else
-		throw(ArgumentError("Unknown optimization method=$(method)"))
+		invoke(optimize, (RegERM, Symbol), linreg, method)
 	end
 end

@@ -1,3 +1,17 @@
-# l2-regularizer; corresponds to Gaussian prior assumption with mean w0 and variance λ²
-l2reg{T<:Real}(w::Vector{T}, λ::Float64) = (norm(w)^2/(2*λ), w./λ)
-l2reg{T<:Real, S<:Real}(w::Vector{T}, λ::Float64, w0::Vector{S}) = (norm(w-w0)^2/(2*λ), (w-w0)./λ)
+export Regularizer, L2reg
+
+abstract Regularizer
+
+## l2-regularizer; corresponds to Gaussian prior assumption with mean w0 and variance λ²
+
+immutable L2reg <: Regularizer
+    w::Vector
+    λ::Float64
+end
+
+function value(r::L2reg) 
+    norm(r.w)^2 / (2 * r.λ)
+end
+function gradient(r::L2reg) 
+    r.w / r.λ
+end

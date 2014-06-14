@@ -20,5 +20,6 @@ function SVM(X::Matrix, y::Vector, λ::Float64)
 end
 
 modelname(::SVM) = "Support Vector Machine"
-losses{T<:Real}(svm::SVM, w::Vector{T}) = hinge(svm, w)
-regularizer{T<:Real}(svm::SVM, w::Vector{T}) = l2reg(w, svm.λ)
+losses(svm::SVM, w::Vector) = Hinge(w, svm.X, svm.y)
+losses(svm::SVM, w::Vector, i::Int) = Hinge(w, svm.X[i,:], [svm.y[i]])
+regularizer(svm::SVM, w::Vector) = L2reg(w, svm.λ)

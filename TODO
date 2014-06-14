@@ -1,0 +1,9 @@
+The following issues are planned to implement (not ordered by priority):
+- cross-validation and use it if regularisation parameter is not provided
+- more efficient optimization algorithms and stochastic gradient descent
+- dual optimization and kernel functions
+- sparse representation of data
+- multiclass version
+- documentation
+- example weights
+- feature weights / customized regularisation function (allow arbitrary covariance)

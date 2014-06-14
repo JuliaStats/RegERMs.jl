@@ -10,13 +10,13 @@ function Base.show(io::IO, model::RegERM)
 	println(io, "$(modelname(model))")
 	println(io, repeat("-", length(modelname(model))))
 	println(io, "regularization parameter: $(model.λ)")
-	println(io, "number of examples:       $(model.num_examples)")
-	println(io, "number of features:       $(model.num_features)")
+	println(io, "number of examples:       $(model.n)")
+	println(io, "number of features:       $(model.m)")
 end
 
 function optimize(model::RegERM)
 	# start value
-	w0 = [1.0*x for x in zeros(model.num_features,1)]
+	w0 = zeros(Float64, model.m)
 
 	obj(w::Vector) = sum(losses(model, w)[1]) + regularizer(model, w)[1]
 	grad(w::Vector) = sum(losses(model, w)[2]) + regularizer(model, w)[2]
@@ -26,7 +26,10 @@ end
 
 include("loss.jl")
 include("regularizer.jl")
+# classification models
 include("svm.jl")
 include("logreg.jl")
+# regression models
+include("linreg.jl")
 
 end # module

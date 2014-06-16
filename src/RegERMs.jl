@@ -28,7 +28,7 @@ function optimize(model::RegERM, w0::Vector, method=:l_bfgs)
 		grad(w::Vector) = sum(gradient(losses(model, w)), 2) + gradient(regularizer(model, w))
 		grad!(w::Vector, storage::Vector) = storage[:] = vec(grad(w))
 
-		Optim.optimize(obj, grad!, w0, method=:l_bfgs, linesearch! = Optim.mt_linesearch!).minimum
+		Optim.optimize(obj, grad!, w0, method=:l_bfgs, linesearch! = Optim.interpolating_linesearch!).minimum
 	else
 		throw(ArgumentError("Unknown optimization method=$(method)"))
 	end

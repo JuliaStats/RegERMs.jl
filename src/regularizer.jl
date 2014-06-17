@@ -2,7 +2,7 @@ export Regularizer, L2reg
 
 abstract Regularizer
 
-## l2-regularizer; corresponds to Gaussian prior assumption with mean w0 and variance λ²
+## l2-regularizer
 
 immutable L2reg <: Regularizer
     w::Vector

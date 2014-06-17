@@ -2,7 +2,7 @@ export Loss, Logistic, Squared, Hinge, value, gradient
 
 abstract Loss
 
-## logistic loss: correspond to likelihood under an exponential family assumption
+## logistic loss
 
 immutable Logistic <: Loss
     w::Vector
@@ -40,7 +40,7 @@ function gradient(l::Squared)
 end
 
 
-## hinge loss: correspond to max-margin assumption
+## hinge loss
 
 immutable Hinge <: Loss
     w::Vector

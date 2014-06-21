@@ -9,17 +9,10 @@ immutable SVM <: RegERM
 end
 
 function SVM(X::Matrix, y::Vector, λ::Float64)
-	(n, m) = size(X)
-	if (n != length(y))
-		throw(DimensionMismatch("Dimensions of X and y mismatch."))
-	end
-	if (sort(unique(y)) != [-1,1])
-		throw(ArgumentError("Class labels have to be either -1 or 1"))
-	end
-	SVM(X, y, λ, n, m)
+	check_arguments(X, y, λ)
+	SVM(X, y, λ, size(X)...)
 end
 
 modelname(::SVM) = "Support Vector Machine"
-losses(svm::SVM, w::Vector) = Hinge(w, svm.X, svm.y)
-losses(svm::SVM, w::Vector, i::Int) = Hinge(w, svm.X[i,:], [svm.y[i]])
-regularizer(svm::SVM, w::Vector) = L2reg(w, svm.λ)
+loss(::SVM, w::Vector, X::Matrix, y::Vector) = Hinge(w, X, y)
+regularizer(::SVM, w::Vector, λ::Float64) = L2reg(w, λ)

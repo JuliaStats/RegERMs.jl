@@ -6,14 +6,12 @@ srand(1)
 X = [1 1; 2 2;  1 -1];
 y = [-1; -1; 1];
 
-method = :l_bfgs
-@test_approx_eq_eps [optimize(SVM(X, y, 0.1), method)...] [-0.1499984861841396,-0.3499984861803246] 1e-5
-@test_approx_eq_eps [optimize(SVM(X, y, 1.0), method)...] [1.34394e-16,-1.0] 1e-5
-@test_approx_eq_eps [optimize(SVM(X, y, 10.0), method)...] [1.34394e-16,-1.0] 1e-5
-method = :sgd
-@test_approx_eq_eps [optimize(SVM(X, y, 0.1), method)...] [-0.1499984861841396,-0.3499984861803246] 5e-2
-@test_approx_eq_eps [optimize(SVM(X, y, 1.0), method)...] [1.34394e-16,-1.0] 5e-2
-@test_approx_eq_eps [optimize(SVM(X, y, 10.0), method)...] [1.34394e-16,-1.0] 5e-2
+@test_approx_eq_eps [optimize(SVM(X, y, 0.1), method=:l_bfgs)...] [-0.1499984861841396,-0.3499984861803246] 1e-5
+@test_approx_eq_eps [optimize(SVM(X, y, 1.0), method=:l_bfgs)...] [1.34394e-16,-1.0] 1e-5
+@test_approx_eq_eps [optimize(SVM(X, y, 10.0), method=:l_bfgs)...] [1.34394e-16,-1.0] 1e-5
+@test_approx_eq_eps [optimize(SVM(X, y, 0.1), method=:sgd)...] [-0.1499984861841396,-0.3499984861803246] 5e-2
+@test_approx_eq_eps [optimize(SVM(X, y, 1.0), method=:sgd)...] [1.34394e-16,-1.0] 5e-2
+@test_approx_eq_eps [optimize(SVM(X, y, 10.0), method=:sgd)...] [1.34394e-16,-1.0] 5e-2
 
 show(IOBuffer(), SVM(X, y, 10.0))
 

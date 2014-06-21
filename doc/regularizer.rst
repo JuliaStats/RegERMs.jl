@@ -13,7 +13,7 @@ Regularizers implement the following main methods:
 
 	Compute the gradient of the regularizer.
 
-The following regulizers are implemented:
+The following regularizers are implemented:
 
 .. function:: L2reg(w::Vector, λ::Float64)
 
@@ -22,7 +22,7 @@ The following regulizers are implemented:
 	.. math::
 		\Omega({\bf w})&=\frac{1}{2\lambda}\|{\bf w}\|^2,
 	
-	where :math:`\lambda` controls the influence of the regularizer.
+	where the regularization parameter :math:`\lambda` controls the influence of the regularizer.
 
 	.. note::
 		The :math:`L^2`-norm regularization corresponds to Gaussian prior assumption of :math:`{\bf w}\sim\mathcal{N}({\bf 0},\lambda{\bf I})`.

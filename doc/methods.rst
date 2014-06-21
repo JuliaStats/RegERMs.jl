@@ -6,8 +6,8 @@ The framework implements the following learning algorithms:
 .. toctree::
    :maxdepth: 2
 
-   linreg.rst
-   logreg.rst
+   ridge_regression.rst
+   logistic_regression.rst
    svm.rst
 
 Implement: ``optimize``

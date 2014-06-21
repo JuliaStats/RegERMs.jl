@@ -57,9 +57,9 @@ include("loss.jl")
 include("regularizer.jl")
 # classification models
 include("svm.jl")
-include("logreg.jl")
+include("logistic_regression.jl")
 # regression models
-include("linreg.jl")
+include("ridge_regression.jl")
 # sgd
 include("sgd.jl")
 

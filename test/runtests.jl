@@ -3,5 +3,5 @@ push!(LOAD_PATH, "src")
 include("loss.jl")
 
 include("svm.jl")
-include("logreg.jl")
-include("linreg.jl")
+include("logistic_regression.jl")
+include("ridge_regression.jl")

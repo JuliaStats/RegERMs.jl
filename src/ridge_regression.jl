@@ -1,28 +1,34 @@
 export LinReg
 
 immutable LinReg <: RegERM
-    X::Matrix  # n x m matrix of n m-dimensional training examples
-    y::Vector  # 1 x n vector with training classes
-    n::Int     # number of training examples
-    m::Int     # number of features
+    X::Matrix       # n x m matrix of n m-dimensional training examples
+    y::Vector       # 1 x n vector with training classes
+    n::Int          # number of training examples
+    m::Int          # number of features
+    kernel::Symbol 	# kernel function
 end
 
-function LinReg(X::Matrix, y::Vector)
+function LinReg(X::Matrix, y::Vector; kernel::Symbol=:linear)
 	check_arguments(X, y)
-	LinReg(X, y, size(X)...)
+	LinReg(X, y, size(X)..., kernel)
 end
 
-modelname(::LinReg) = "Linear Regression"
+methodname(::LinReg) = "Linear Regression"
 loss(::LinReg, w::Vector, X::Matrix, y::Vector) = Squared(w, X, y)
 regularizer(::LinReg, w::Vector, λ::Float64) = L2reg(w, λ)
 
 # closed-form solution
-function optimize(linreg::LinReg, w0::Vector, λ::Float64; method::Symbol=:closed_form)
-	if method == :closed_form
-		X = linreg.X
+function optimize(linreg::LinReg, λ::Float64; optimizer::Symbol=:closed_form)
+	if (λ <= 0)
+		throw(ArgumentError("Regularization parameter has to be positive"))
+	end
+	
+	if optimizer == :closed_form
 		y = linreg.y
-		(X'*X + eye(linreg.m)/λ)\X'*y
+		model, X = Model(linreg.X, y, linreg.kernel)
+		model.w = (X'*X + eye(linreg.m)/λ)\X'*y
+		model
 	else
-		invoke(optimize, (RegERM, Vector, Float64, Symbol), linreg, w0, λ, method)
+		invoke(optimize, (RegERM, Float64, Symbol), linreg, λ, optimizer)
 	end
 end

@@ -30,6 +30,13 @@ end
 
 classify(model::PrimalModel, X::Matrix) = sign(X*model.w)
 
+# Pretty-print
+function Base.show(io::IO, model::PrimalModel)
+	println(io, "Primal Model")
+	println(io, repeat("-", length("Primal Model")))
+	println(io, "number of dimensions: $(length(model.w))")
+end
+
 ## Dual model
 
 # TOOD(cs): map should be immutable
@@ -39,3 +46,12 @@ type DualModel
 end
 
 classify(model::DualModel, X::Matrix)  = sign(apply(model.map, X)*model.w)
+
+# Pretty-print
+function Base.show(io::IO, model::DualModel)
+	println(io, "Dual Model")
+	println(io, repeat("-", length("Dual Model")))
+	println(io, "number of dimensions: $(length(model.w))")
+	println(io, "number of examples:   $(size(model.map.K,1))")
+	println(io, "kernel function:      $(model.map.kernel)")
+end

@@ -19,6 +19,19 @@ show(IOBuffer(), SVM(X, y))
 @test_throws DimensionMismatch SVM(X', y) 
 @test_throws ArgumentError SVM(X, [3; 3; 2]) 
 
+# check automatic selection of model 
+X = [1 1; -1 -1;  1 -1; -1 1]
+y = [1; 1; -1; -1]
+model = optimize(SVM(X, y), 10.0, optimizer=:sgd)
+@test isa(model, PrimalModel)
+show(IOBuffer(), model)
+
+X = [1 1 -1 0.1; 2 2 0.5 2;  1 -1 -0.1 0.1]
+y = [-1; -1; 1]
+model = optimize(SVM(X, y), 10.0, optimizer=:sgd)
+@test isa(model, DualModel)
+show(IOBuffer(), model)
+
 # check kernelized solution
 X = [1 1; -1 -1;  1 -1; -1 1]
 y = [1; 1; -1; -1]

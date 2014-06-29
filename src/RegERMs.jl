@@ -53,6 +53,7 @@ function Base.show(io::IO, model::RegERM)
 	println(io, repeat("-", length(methodname(model))))
 	println(io, "number of examples:       $(model.n)")
 	println(io, "number of features:       $(model.m)")
+	println(io, "kernel function:          $(model.kernel)")
 end
 
 # include 

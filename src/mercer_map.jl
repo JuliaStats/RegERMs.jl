@@ -15,7 +15,7 @@ function MercerMap(X::Matrix, kernel::Symbol)
     kernelfcn = eval(kernel)
     K = center(kernelfcn(X, X))
 
-    d, V = eig(K)
+    d, V = eig(Symmetric(K))
 
     # consider dimensions with eigenvalues > 1e-9
     i = d .> 1e-9

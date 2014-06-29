@@ -1,3 +1,5 @@
+<img src="http://bigcrunsh.github.io/images/logo.png" alt="RegERMs Logo" width="210" height="125"></img>
+
 RegERMs.jl
 ==========
 [![Build Status](https://travis-ci.org/BigCrunsh/RegERMs.jl.svg?branch=master)](https://travis-ci.org/BigCrunsh/RegERMs.jl)
@@ -10,18 +12,23 @@ This package implements several machine learning algorithms in a regularised emp
 Some examples:
 
 ```julia
-# define some toy data
-X = [1 1; 2 2;  1 -1]; # (3 examples with 2 features)
-y = [-1; -1; 1];       # binary class values for the 3 examples
+# define some toy data (XOR - example)
+np = 100
+nn = 100
+X = [randn(int(np/2),1)+1 randn(int(np/2),1)+1; randn(int(np/2-0.5),1)-1 randn(int(np/2-0.5),1)-1;
+     randn(int(nn/2),1)+1 randn(int(nn/2),1)-1; randn(int(nn/2-0.5),1)-1 randn(int(nn/2-0.5),1)+1] # examples with 2 features
+y = vec([ones(np,1); -ones(nn,1)])       # binary class values
 
-# choose SVM as learning algorithm (regularization parameter is 0.1)
-model = SVM(X, y, 0.1)
+# choose SVM as learning algorithm
+svm = SVM(X, y; kernel=:rbf)
 
-# get solution
-w = optimize(model)
+# get solution (regularization parameter is 0.1)
+regParam = 0.1
+model = optimize(svm, regParam)
 
-# make predictions
-ybar = sign(X*w)
+# make predictions and compute accuracy
+ybar = classify(model, X)
+acc = mean(ybar .== y)
 
 ```
 

@@ -1,10 +1,11 @@
 module RegERMs
-using Optim
+using Optim, MLBase
 
 export RegERM, optimize, objective
 
-abstract RegERM
+import Base.Order: lt
 
+abstract RegERM
 
 # FIX: could not use ``method`` as keyword directly due to ``invoke` in linreg, see https://github.com/JuliaLang/julia/issues/7045
 optimize(method::RegERM, λ::Float64; optimizer::Symbol=:l_bfgs) = optimize(method, λ, optimizer)
@@ -36,7 +37,55 @@ function optimize(method::RegERM, λ::Float64, optimizer::Symbol=:l_bfgs)
 	end
 	model
 end
+function optimize(method::RegERM; optimizer::Symbol=:l_bfgs)
+	λ = grid_search(method; optimizer=optimizer)
+	optimize(method, λ, optimizer=optimizer)
+end
 
+# hyperparameter tuning
+
+# FIXME(cs): replace by generic CV-routine [https://github.com/JuliaStats/MLBase.jl/issues/2]
+function cross_validation(estfun::Function, evalfun::Function, n::Integer, gen)
+    i, first, scores = 0, true, zeros(length(gen))
+
+    for test_inds in gen
+        i += 1
+        train_inds = setdiff(1:n, test_inds)
+        model = estfun(train_inds)
+        scores[i] = evalfun(model, test_inds)
+    end
+
+    return mean(scores), std(scores)
+end
+
+function cross_validation(method::RegERM, λ::Float64; folds::Int=5, optimizer::Symbol=:l_bfgs) 
+	cross_validation(
+		inds -> optimize(typeof(method)(method.X[inds,:], method.y[inds]; kernel=method.kernel), λ; optimizer=optimizer),
+        (model, inds) -> mean(classify(model, method.X[inds,:]) .== method.y[inds]), 
+        method.n, Kfold(method.n, folds))
+end
+
+# TODO(cs): reverse order of evaluation to avoid unnecessary mercer mappings
+# TODO(cs): extend grid if best value is found on the boundary
+function grid_search(method::RegERM, param_grid=10.0.^(-4:4); optimizer::Symbol=:l_bfgs)
+    best_perf = NaN
+    best_param = nothing
+    first = true
+
+    for param in param_grid
+        perf,_ = cross_validation(method, param; optimizer=optimizer)
+
+        if first || lt(Forward, best_perf, perf)
+            best_perf = perf
+            best_param = param
+            first = false
+        end
+    end
+
+    return best_param
+end
+
+# verify input arguments
 function check_arguments(X::Matrix, y::Vector) 
 	(n, m) = size(X)
 	if (n != length(y))

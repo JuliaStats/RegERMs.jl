@@ -1,4 +1,4 @@
-export SVM, loss, regularizer
+export SVM, loss, regularizer, tune
 
 immutable SVM <: RegERM
     X::Matrix  		# n x m matrix of n m-dimensional training examples

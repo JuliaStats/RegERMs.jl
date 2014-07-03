@@ -37,3 +37,12 @@ X = [1 1; -1 -1;  1 -1; -1 1]
 y = [1; 1; -1; -1]
 model = optimize(SVM(X, y, kernel=:rbf), 0.1, optimizer=:l_bfgs)
 @test classify(model, X) == y
+
+
+# check cross-validation
+np = 25
+nn = 25
+X = [randn(int(np/2),1)+1 randn(int(np/2),1)+1; randn(int(np/2-0.5),1)-1 randn(int(np/2-0.5),1)-1;
+     randn(int(nn/2),1)+1 randn(int(nn/2),1)-1; randn(int(nn/2-0.5),1)-1 randn(int(nn/2-0.5),1)+1] # examples with 2 features
+y = vec([ones(np,1); -ones(nn,1)])       # binary class values
+optimize(SVM(X,y,kernel=:rbf))

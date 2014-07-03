@@ -30,7 +30,7 @@ apply(map::MercerMap) = map.V*diagm(map.d)
 function apply(map::MercerMap, X::Matrix)
     kernelfcn = eval(map.kernel)
     KT = center(map.K, kernelfcn(map.X, X))
-    KT*map.V*diagm(1./map.d)
+    KT'*map.V*diagm(1./map.d)
 end
 
 # center data to origin in feature space (M. Meila: Data Centering in Feature Space, Eq. 17)

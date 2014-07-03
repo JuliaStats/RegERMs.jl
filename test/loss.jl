@@ -1,5 +1,3 @@
-using RegERMs, Base.Test
-
 w = [1; 1]
 X = [1 1; 2 2;  1 -1];
 y = [-1; -1; 1];

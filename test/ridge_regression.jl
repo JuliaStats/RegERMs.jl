@@ -1,5 +1,3 @@
-using RegERMs, Base.Test
-
 # Seed random generator to avoid random effects in testing
 srand(1)
 

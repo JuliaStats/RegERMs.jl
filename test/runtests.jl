@@ -1,5 +1,7 @@
 push!(LOAD_PATH, "src")
 
+using RegERMs, Base.Test
+
 include("loss.jl")
 include("model.jl")
 include("mercer_map.jl")

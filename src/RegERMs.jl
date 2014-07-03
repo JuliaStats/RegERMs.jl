@@ -1,7 +1,7 @@
 module RegERMs
 using Optim
 
-export RegERM, optimize, objective
+export RegERM, optimize
 
 abstract RegERM
 

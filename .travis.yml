@@ -14,5 +14,6 @@ before_install:
 script:
   - julia -e 'Pkg.init(); run(`ln -s $(pwd()) $(Pkg.dir("RegERMs"))`); Pkg.pin("RegERMs"); Pkg.resolve()'
   - julia --code-coverage test/runtests.jl
+  - julia -e 'Pkg.update(); Pkg.add("Lint"); using Lint; lintpkg( "RegERMs", returnMsgs=true)'
 after_success:
   - julia -e 'cd(Pkg.dir("RegERMs")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'

@@ -1,19 +1,10 @@
 export Model, PrimalModel, DualModel, classify
 
-function Model(X::Matrix, y::Vector)
-	n, m = size(X)
-	if m > n # learn dual model to reduce number of dimensions
-		Model(X, y, :linear)
-	else
-		w0 = vec(mean(X[y.==1,:],1).-mean(X[y.==-1,:]))
-		PrimalModel(w0), X
-	end
-end
-
-function Model(X::Matrix, y::Vector, kernel::Symbol)
+function Model(X::Matrix, y::Vector, kernel::Symbol=:linear)
 	n, m = size(X)
 	if m < n && kernel==:linear # learn primal model to reduce number of dimensions
-		Model(X, y)
+		w0 = vec(mean(X[y.==1,:],1).-mean(X[y.==-1,:]))
+		PrimalModel(w0), X
 	else
 		map = MercerMap(X, kernel)
 		X = apply(map)

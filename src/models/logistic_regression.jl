@@ -14,5 +14,5 @@ function LogReg(X::Matrix, y::Vector; kernel::Symbol=:linear)
 end
 
 methodname(::LogReg) = "Logistic Regression"
-loss(::LogReg, w::Vector, X::Matrix, y::Vector) = Logistic(w, X, y)
+loss(::LogReg) = LogisticLoss()
 regularizer(::LogReg, w::Vector, λ::Float64) = L2reg(w, λ)

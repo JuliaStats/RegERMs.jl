@@ -2,10 +2,20 @@ push!(LOAD_PATH, "src")
 
 using RegERMs, Base.Test
 
-include("loss.jl")
-include("model.jl")
-include("mercer_map.jl")
 
-include("svm.jl")
-include("logistic_regression.jl")
-include("ridge_regression.jl")
+tests = [
+    "loss",
+    "model", 
+    "mercer_map",
+    "svm", 
+    "logistic_regression", 
+    "ridge_regression"
+]
+
+println("Running tests:")
+
+for t in tests
+    test_fn = "$t.jl"
+    println("* $test_fn")
+    include(test_fn)
+end

@@ -1,59 +1,65 @@
-export Loss, Logistic, Squared, Hinge, value, gradient
+export Loss, LogisticLoss, SquaredLoss, HingeLoss, value, values, deriv, derivs, value_and_deriv, tloss
 
 abstract Loss
 
+# for discriminative (conditional) models
+abstract OrdinalLoss <: Loss
+abstract NominalLoss <: Loss
+
+# for binary-class cases
+abstract BinomialLoss <: NominalLoss
+# for multi-class cases
+abstract MultinomialLoss <: NominalLoss
+
+# fall back
+value_and_deriv(l::Loss, fv::Real, y::Real) = (value(l, fv, y), deriv(l, fv, y))
+
+function tloss(l::Loss, fv::AbstractVector, y::AbstractVector)
+    n = size(fv, 1)  # n is the number of samples
+    s = 0.0
+    for i = 1:n
+        s += value(l, fv[i], y[i])
+    end
+    return s
+end
+
+function values(l::Loss, fv::AbstractVector, y::AbstractVector)
+    n = size(fv, 1)  # n is the number of samples
+    v = zeros(n)
+    for i = 1:n
+        v[i] = value(l, fv[i], y[i])
+    end
+    return v
+end
+
+function derivs(l::Loss, fv::AbstractVector, y::AbstractVector)
+    n = size(fv, 1)  # n is the number of samples
+    dv = zeros(n)
+    for i = 1:n
+        dv[i] = deriv(l, fv[i], y[i])
+    end
+    return dv
+end
+
 ## logistic loss
 
-immutable Logistic <: Loss
-    w::Vector
-    X::Matrix
-    y::Vector
-end
+type LogisticLoss <: BinomialLoss end
 
-function value(l::Logistic) 
-    f = l.X*l.w
-    log(1.+exp(-l.y.*f))
-end
-function gradient(l::Logistic) 
-    f = l.X*l.w
-    g = -l.y.*l.X ./ (1 .+ exp(l.y.*f))
-    g'
-end
-
+value(l::LogisticLoss, fv::Real, y::Int) = if fv>34 -y*fv else log(1+exp(-y*fv)) end
+deriv(l::LogisticLoss, fv::Real, y::Int) = -y / (1 + exp(y*fv))
 
 ## squared loss
 
-immutable Squared <: Loss
-    w::Vector
-    X::Matrix
-    y::Vector
-end
+type SquaredLoss <: OrdinalLoss end
 
-function value(l::Squared) 
-    f = l.X*l.w
-    (f - l.y).^2 / 2
-end
-function gradient(l::Squared) 
-    f = l.X*l.w
-    g = l.X.*(f - l.y)
-    g'
-end
-
+value(l::SquaredLoss, fv::Real, y::Real) = 0.5 * (fv-y) * (fv-y)
+deriv(l::SquaredLoss, fv::Real, y::Real) = fv-y
 
 ## hinge loss
 
-immutable Hinge <: Loss
-    w::Vector
-    X::Matrix
-    y::Vector
-end
+type HingeLoss <: BinomialLoss end
 
-function value(l::Hinge) 
-    f = l.X*l.w
-    max(0, 1.-l.y.*f)
-end
-function gradient(l::Hinge) 
-    h = value(l)
-    g = -l.y.*l.X.*(h .> 0)
-    g'
-end
+value(l::HingeLoss, fv::Real, y::Int) = max(0, 1-y*fv)
+deriv(l::HingeLoss, fv::Real, y::Int) = -y*(value(l, fv, y) > 0)
+
+value_and_deriv(l::HingeLoss, fv::Real, y::Int) = (h = max(0, 1-y*fv); (h, -y*(h>0)))

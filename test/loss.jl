@@ -1,21 +1,41 @@
-w = [1; 1]
-X = [1 1; 2 2;  1 -1];
-y = [-1; -1; 1];
+eps = 1e-5
+# list of losses
+losslist = [
+	HingeLoss(),
+	LogisticLoss(),
+	SquaredLoss()
+]
 
-@test_approx_eq_eps value(Logistic(w, X, y)) [2.12693, 4.01815, 0.693147] 1e-5
-@test_approx_eq_eps gradient(Logistic(w, X[1,:], [y[1]])) [0.880797; 0.880797] 1e-5
-@test_approx_eq_eps gradient(Logistic(w, X[2,:], [y[2]])) [1.96403; 1.96403] 1e-5
-@test_approx_eq_eps gradient(Logistic(w, X[3,:], [y[3]])) [-0.5; 0.5] 1e-5
-@test_approx_eq_eps sum(gradient(Logistic(w, X, y)),2) [2.34482; 3.34482] 1e-5
+fv, y = [2.; 4.; 0.], [-1; -1; 1]
+# expected values for f and y
+expected_values(::HingeLoss) = [3.0, 5.0, 1.0]
+expected_derivs(::HingeLoss) = [1.0, 1.0, -1.0]
 
-@test_approx_eq_eps value(Squared(w, X, y)) [4.5, 12.5, 0.5] 1e-5
-@test_approx_eq_eps gradient(Squared(w, X[1,:], [y[1]])) [3; 3] 1e-5
-@test_approx_eq_eps gradient(Squared(w, X[2,:], [y[2]])) [10; 10] 1e-5
-@test_approx_eq_eps gradient(Squared(w, X[3,:], [y[3]])) [-1; 1] 1e-5
-@test_approx_eq_eps sum(gradient(Squared(w, X, y)),2) [12; 14] 1e-5
+expected_values(::LogisticLoss) = [2.12693, 4.01815, 0.693147]
+expected_derivs(::LogisticLoss) = [0.88079, 0.98201,-0.5]
 
-@test_approx_eq_eps value(Hinge(w, X, y)) [3, 5, 1] 1e-5
-@test_approx_eq_eps gradient(Hinge(w, X[1,:], [y[1]])) [1; 1] 1e-5
-@test_approx_eq_eps gradient(Hinge(w, X[2,:], [y[2]])) [2; 2] 1e-5
-@test_approx_eq_eps gradient(Hinge(w, X[3,:], [y[3]])) [-1; 1] 1e-5
-@test_approx_eq_eps sum(gradient(Hinge(w, X, y)),2) [2; 4] 1e-5
+expected_values(::SquaredLoss) = [4.5, 12.5, 0.5]
+expected_derivs(::SquaredLoss) = [3.0, 5.0, -1.0]
+
+for loss in losslist
+	print(" - ")
+	println(loss)
+
+	# check values
+	@test_approx_eq_eps values(loss, fv, y) expected_values(loss) eps
+	for i in 1:3
+		@test_approx_eq_eps value(loss, fv[i], y[i]) expected_values(loss)[i] eps
+	end
+	@test_approx_eq_eps tloss(loss, fv, y) sum(expected_values(loss)) eps
+
+	# check derivatives
+	@test_approx_eq_eps derivs(loss, fv, y) expected_derivs(loss) eps
+	for i in 1:3
+		@test_approx_eq_eps deriv(loss, fv[i], y[i]) expected_derivs(loss)[i] eps
+	end
+	
+	# check values and derivatives
+	for i in 1:3
+		@test_approx_eq_eps [value_and_deriv(loss, fv[i], y[i])...] [expected_values(loss)[i], expected_derivs(loss)[i]] eps
+	end
+end

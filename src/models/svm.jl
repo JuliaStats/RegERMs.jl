@@ -14,5 +14,5 @@ function SVM(X::Matrix, y::Vector; kernel::Symbol=:linear)
 end
 
 methodname(::SVM) = "Support Vector Machine"
-loss(::SVM, w::Vector, X::Matrix, y::Vector) = Hinge(w, X, y)
+loss(::SVM) = HingeLoss()
 regularizer(::SVM, w::Vector, λ::Float64) = L2reg(w, λ)

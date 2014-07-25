@@ -1,4 +1,15 @@
-export sgd
+export SGDSolver
+
+type SGDSolver <: RegressionSolver end
+
+# TODO: λ should be a part of the regularizer and be handled at the model level (e.g., via automatic cross-validation if not provided)
+function solve(method::RegERM, ::SGDSolver, X::AbstractMatrix, y::AbstractVector, w0::AbstractVector, λ::Float64)
+	loss_grad(w::Vector, i::Int) = vec(X[i,:]).*deriv(loss(method), (X[i,:]*w)[1], y[i])
+	reg_grad(w::Vector) = gradient(regularizer(method, w, λ)) / method.n
+	grad(w::Vector, i::Int) = loss_grad(w, i) + reg_grad(w)
+
+	sgd(grad, method.n, w0)
+end
 
 # step size has to statisfy the conditions sum alpha^2 < inf and sum alpha = inf
 # 1 / k and 1 / sqrt(k) are common choicses

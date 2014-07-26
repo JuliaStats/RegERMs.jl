@@ -1,57 +1,60 @@
 module RegERMs
+
+using StatsBase
 using Optim
 
-export RegERM, RegressionSolver, optimize
+import StatsBase: predict
+import Optim: optimize 
 
-abstract RegERM
-abstract RegressionSolver
+## Exports
 
-# FIX: could not use ``method`` as keyword directly due to ``invoke` in RidgeReg, see https://github.com/JuliaLang/julia/issues/7045
-optimize(method::RegERM, λ::Float64; optimizer::Symbol=:l_bfgs) = optimize(method, λ, optimizer)
-function optimize(method::RegERM, λ::Float64, optimizer::Symbol=:l_bfgs)
-	if (λ <= 0)
-		throw(ArgumentError("Regularization parameter has to be positive"))
-	end
+export 
+    # loss
+    Loss,           # abstract type for all kinds of loss
+    LogisticLoss,   # Type to represent logistic loss
+    SquaredLoss,    # Type to represent squared loss
+    HingeLoss,      # Type to represent hinge loss
 
-	# init model
-	model, X = Model(method.X, method.y, method.kernel)
-	y = method.y
+    value,              # evaluate a single value
+    values,             # evaluate multiple values
+    deriv,              # evaluate a single derivative value
+    derivs,             # evaluate multiple derivative values
+    value_and_deriv,    # jointly evaluate function value and derivative
+    tloss,              # the total loss 
 
-	if optimizer == :sgd
-		model.w = solve(method, SGDSolver(), X, y, model.w, λ)
-	elseif optimizer == :l_bfgs
-		model.w = solve(method, LBFGSSolver(), X, y, model.w, λ)
-	else
-		throw(ArgumentError("Unknown optimizer=$(optimizer)"))
-	end
-	model
-end
+    # regularizer
+    Regularizer,    # abstract type for all kinds of regularizers
+    L2reg,          # Type to represent L2 regularizer
 
-function check_arguments(X::Matrix, y::Vector) 
-	(n, m) = size(X)
-	if (n != length(y))
-		throw(DimensionMismatch("Dimensions of X and y mismatch."))
-	end
-	if (sort(unique(y)) != [-1,1])
-		throw(ArgumentError("Class labels have to be either -1 or 1"))
-	end
-end
+    # model
+    Model, 
+    PrimalModel, 
+    DualModel, 
+    predict,
 
-# Pretty-print
-function Base.show(io::IO, model::RegERM)
-	println(io, "$(methodname(model))")
-	println(io, repeat("-", length(methodname(model))))
-	println(io, "number of examples:       $(model.n)")
-	println(io, "number of features:       $(model.m)")
-	println(io, "kernel function:          $(model.kernel)")
-end
+    # models
+    SVM,
+    RidgeReg,
+    LogReg,
+
+    # solvers
+    LBFGSSolver,
+    SGDSolver,
+
+    # optim
+    RegERM, 
+    RegressionSolver, 
+    optimize
+
+## Source files
 
 # include 
-
 include("loss.jl")
 include("regularizer.jl")
-include("mercer_map.jl")
+include("mercer_map.jl")   ## TODO: need some discussion about the API for this
 include("model.jl")
+include("optim.jl")
+
 # classification methods
 include("models/svm.jl")
 include("models/logistic_regression.jl")

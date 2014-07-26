@@ -1,4 +1,5 @@
 The following issues should be addressed (not ordered by priority):
+
 - propagate kernel parameters
 - cross-validation and use it if regularisation parameter is not provided
 - sparse representation of data

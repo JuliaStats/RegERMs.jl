@@ -1,4 +1,3 @@
-export Loss, LogisticLoss, SquaredLoss, HingeLoss, value, values, deriv, derivs, value_and_deriv, tloss
 
 abstract Loss
 

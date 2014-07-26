@@ -1,5 +1,3 @@
-export Regularizer, L2reg
-
 abstract Regularizer
 
 ## l2-regularizer
@@ -12,6 +10,7 @@ end
 function value(r::L2reg) 
     norm(r.w)^2 / (2 * r.λ)
 end
+
 function gradient(r::L2reg) 
     r.w / r.λ
 end

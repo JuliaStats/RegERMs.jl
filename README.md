@@ -27,7 +27,7 @@ regParam = 0.1
 model = optimize(svm, regParam)
 
 # make predictions and compute accuracy
-ybar = classify(model, X)
+ybar = predict(model, X)
 acc = mean(ybar .== y)
 
 ```

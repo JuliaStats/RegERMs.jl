@@ -44,16 +44,22 @@ end
 
 type LogisticLoss <: BinomialLoss end
 
-value(l::LogisticLoss, fv::Real, y::Int) = if fv>34 -y*fv else log(1+exp(-y*fv)) end
+value(l::LogisticLoss, fv::Real, y::Int) = fv>34 ? -y*fv : log(1+exp(-y*fv))
 deriv(l::LogisticLoss, fv::Real, y::Int) = -y / (1 + exp(y*fv))
+
+function value_and_deriv(l::LogisticLoss, fv::Real, y::Int)
+    emyfv = exp(-y*fv)
+    (fv>34 ? -y*fv : log(1+emyfv), -y * emyfv/(1+emyfv))
+end
 
 ## squared loss
 
 type SquaredLoss <: OrdinalLoss end
 
-value(l::SquaredLoss, fv::Real, y::Real) = 0.5 * (fv-y) * (fv-y)
+value(l::SquaredLoss, fv::Real, y::Real) = (r = fv-y; 0.5 * r*r)
 deriv(l::SquaredLoss, fv::Real, y::Real) = fv-y
 
+value_and_deriv(l::SquaredLoss, fv::Real, y::Real) = (r=fv-y; (0.5 * r*r, r))
 ## hinge loss
 
 type HingeLoss <: BinomialLoss end

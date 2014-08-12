@@ -39,3 +39,12 @@ for loss in losslist
         @test_approx_eq_eps [value_and_deriv(loss, fv[i], y[i])...] [expected_values(loss)[i], expected_derivs(loss)[i]] eps
     end
 end
+
+#Check LogisticLoss for special case when fv > 34
+println(" - LogisticLoss(), fv > 34")
+@test_approx_eq_eps value(LogisticLoss(), 40.0, 1) -40.0 eps
+@test_approx_eq_eps value(LogisticLoss(), 40.0, -1) 40.0 eps
+@test_approx_eq_eps deriv(LogisticLoss(), 40.0, 1)  0.0 eps
+@test_approx_eq_eps deriv(LogisticLoss(), 40.0, -1) 1.0 eps
+@test_approx_eq_eps [value_and_deriv(LogisticLoss(), 40.0, 1)...]  [-40.0, 0.0] eps
+@test_approx_eq_eps [value_and_deriv(LogisticLoss(), 40.0, -1)...] [40.0, 1.0] eps

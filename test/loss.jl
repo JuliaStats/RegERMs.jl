@@ -6,16 +6,16 @@ losslist = [
     SquaredLoss()
 ]
 
-fv, y = [2.; 4.; 0.], [-1; -1; 1]
+fv, y = [2.; 4.; 0.; 40; 40], [-1; -1; 1; 1; -1]
 # expected values for f and y
-expected_values(::HingeLoss) = [3.0, 5.0, 1.0]
-expected_derivs(::HingeLoss) = [1.0, 1.0, -1.0]
+expected_values(::HingeLoss) = [3.0, 5.0, 1.0, 0.0, 41.0]
+expected_derivs(::HingeLoss) = [1.0, 1.0, -1.0, 0.0, 1.0]
 
-expected_values(::LogisticLoss) = [2.12693, 4.01815, 0.693147]
-expected_derivs(::LogisticLoss) = [0.88079, 0.98201,-0.5]
+expected_values(::LogisticLoss) = [2.12693, 4.01815, 0.693147, 0.0, 40.0]
+expected_derivs(::LogisticLoss) = [0.88079, 0.98201,-0.5, 0.0, 1.0]
 
-expected_values(::SquaredLoss) = [4.5, 12.5, 0.5]
-expected_derivs(::SquaredLoss) = [3.0, 5.0, -1.0]
+expected_values(::SquaredLoss) = [4.5, 12.5, 0.5, 760.5,840.5]
+expected_derivs(::SquaredLoss) = [3.0, 5.0, -1.0, 39.0, 41.0]
 
 for loss in losslist
     print(" - ")
@@ -39,12 +39,3 @@ for loss in losslist
         @test_approx_eq_eps [value_and_deriv(loss, fv[i], y[i])...] [expected_values(loss)[i], expected_derivs(loss)[i]] eps
     end
 end
-
-#Check LogisticLoss for special case when fv > 34
-println(" - LogisticLoss(), fv > 34")
-@test_approx_eq_eps value(LogisticLoss(), 40.0, 1) -40.0 eps
-@test_approx_eq_eps value(LogisticLoss(), 40.0, -1) 40.0 eps
-@test_approx_eq_eps deriv(LogisticLoss(), 40.0, 1)  0.0 eps
-@test_approx_eq_eps deriv(LogisticLoss(), 40.0, -1) 1.0 eps
-@test_approx_eq_eps [value_and_deriv(LogisticLoss(), 40.0, 1)...]  [-40.0, 0.0] eps
-@test_approx_eq_eps [value_and_deriv(LogisticLoss(), 40.0, -1)...] [40.0, 1.0] eps

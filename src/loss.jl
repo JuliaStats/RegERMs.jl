@@ -44,7 +44,7 @@ end
 
 type LogisticLoss <: BinomialLoss end
 
-value(l::LogisticLoss, fv::Real, y::Int) = fv>34 ? -y*fv : log(1+exp(-y*fv))
+value(l::LogisticLoss, fv::Real, y::Int) = -y*fv>34 ? -y*fv : log(1+exp(-y*fv))
 deriv(l::LogisticLoss, fv::Real, y::Int) = -y / (1 + exp(y*fv))
 
 function value_and_deriv(l::LogisticLoss, fv::Real, y::Int)

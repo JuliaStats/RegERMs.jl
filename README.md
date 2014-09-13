@@ -4,6 +4,7 @@ RegERMs.jl
 ==========
 [![Build Status](https://travis-ci.org/JuliaStats/RegERMs.jl.svg?branch=master)](https://travis-ci.org/JuliaStats/RegERMs.jl)
 [![Coverage Status](https://img.shields.io/coveralls/JuliaStats/RegERMs.jl.svg)](https://coveralls.io/r/JuliaStats/RegERMs.jl)
+[![RegERMs](http://pkg.julialang.org/badges/RegERMs_release.svg)](http://pkg.julialang.org/?pkg=RegERMs&ver=release)
 
 This package implements several machine learning algorithms in a regularised empirical risk minimisation framework (SVMs,  LogReg, Linear Regression) in Julia.
 

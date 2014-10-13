@@ -10,18 +10,20 @@ function optimize(method::RegERM, λ::Float64, optimizer::Symbol=:l_bfgs)
     end
 
     # init model
-    model, X = Model(method.X, method.y, method.kernel)
-    y = method.y
+    model = Model(method.X, method.y, method.regression_type, method.kernel)
 
     if optimizer == :sgd
-        model.w = solve(method, SGDSolver(), X, y, model.w, λ)
+        model.theta = solve(model, method, SGDSolver(), method.X, method.y, λ)
     elseif optimizer == :l_bfgs
-        model.w = solve(method, LBFGSSolver(), X, y, model.w, λ)
+        model.theta = solve(model, method, LBFGSSolver(), method.X, method.y, λ)
     else
         throw(ArgumentError("Unknown optimizer=$(optimizer)"))
     end
     model
 end
+
+objective(method::RegERM, model::RegressionModel, λ::Float64, theta::AbstractVector) =
+    tloss(loss(method), values(model, method.X, theta), method.y) + value(regularizer(method, theta, λ))
 
 function check_arguments(X::Matrix, y::Vector) 
     (n, m) = size(X)

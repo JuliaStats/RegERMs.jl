@@ -1,12 +1,17 @@
 type SGDSolver <: RegressionSolver end
 
 # TODO: λ should be a part of the regularizer and be handled at the model level (e.g., via automatic cross-validation if not provided)
-function solve(method::RegERM, ::SGDSolver, X::AbstractMatrix, y::AbstractVector, w0::AbstractVector, λ::Float64)
-    loss_grad(w::Vector, i::Int) = vec(X[i,:]).*deriv(loss(method), (X[i,:]*w)[1], y[i])
-    reg_grad(w::Vector) = gradient(regularizer(method, w, λ)) / method.n
-    grad(w::Vector, i::Int) = loss_grad(w, i) + reg_grad(w)
+function solve(model::RegressionModel, method::RegERM, ::SGDSolver, X::AbstractMatrix, y::AbstractVector, λ::Float64)
+    function loss_grad(theta::Vector, i::Int)
+        grad_model = gradient(model.f, X[i,:], theta)
+        grad_loss = derivs(loss(method), values(model, X[i,:], theta), [y[i]])
+        vec(broadcast(*, grad_loss',grad_model))
+    end
 
-    sgd(grad, method.n, w0)
+    reg_grad(theta::Vector) = gradient(regularizer(method, theta, λ)) / method.n
+    grad(theta::Vector, i::Int) = loss_grad(theta, i) + reg_grad(theta)
+
+    sgd(grad, method.n, model.theta)
 end
 
 # step size has to statisfy the conditions sum alpha^2 < inf and sum alpha = inf
@@ -44,7 +49,7 @@ function sgd{T}(grad::Function,
             alpha = step_size(k)
 
             # Update current solution
-            x = x_previous - alpha*grad(x_previous, i)
+            x -= alpha*grad(x, i)
         end
 
         converged = norm(x - x_previous) < xtol

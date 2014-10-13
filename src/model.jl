@@ -1,46 +1,73 @@
-function Model(X::Matrix, y::Vector, kernel::Symbol=:linear)
-    n, m = size(X)
-    if m < n && kernel==:linear # learn primal model to reduce number of dimensions
-        w0 = vec(mean(X[y.==1,:],1).-mean(X[y.==-1,:]))
-        PrimalModel(w0), X
+
+abstract RegressionModel
+
+function Model(X::AbstractMatrix, y::AbstractVector, regression_type::Symbol, kernel::Symbol)
+    if kernel == :linear
+        Model(X, y, regression_type)
     else
-        map = MercerMap(X, kernel)
-        X = apply(map)
-        w0 = vec(mean(X[y.==1,:],1).-mean(X[y.==-1,:]))
-        DualModel(w0, map), X
+        error("kernel=$(kernel) is not implemented yet")
     end
 end
 
-## Primal model
-
-type PrimalModel
-    w::Vector # weight vector of linear function
+function Model(X::AbstractMatrix, y::AbstractVector, regression_type::Symbol, f::RegressionFunction=LinearRegressionFunction())
+    if regression_type==:ordinal
+        w0 = vec(mean(X,1))
+        OrdinalModel(f, w0)
+    elseif regression_type==:binomial
+        w0 = vec(mean(X[y.==1,:],1).-mean(X[y.==-1,:]))
+        BinomialModel(f, w0)
+    elseif regression_type==:multinomial
+        Y = unique(y)
+        k = length(Y)
+        n, m = size(X)
+        w0 = zeros(m,k-1)
+        w0_k = mean(X[y.==Y[k],:],1)
+        for i in 1:k-1
+            w0[:, i] = mean(X[y.==Y[i],:],1)-w0_k
+        end
+        MultinomialModel(f, vec(w0), k)
+    else
+        error("regression_type=$(regression_type) is not implemented yet")
+    end
 end
 
-predict(model::PrimalModel, X::Matrix) = sign(X*model.w)
+values(model::RegressionModel, X::AbstractMatrix, theta::AbstractVector=model.theta) = values(model.f, X, theta)
 
-# Pretty-print
-function Base.show(io::IO, model::PrimalModel)
-    println(io, "Primal Model")
-    println(io, repeat("-", length("Primal Model")))
-    println(io, "number of dimensions: $(length(model.w))")
+# Ordinal regression
+
+type OrdinalModel <: RegressionModel
+    f::RegressionFunction
+    theta::Vector            # parameter vector of regression function
 end
 
-## Dual model
+predict(model::OrdinalModel, X::AbstractMatrix) = values(model.f, X)
 
-# TOOD(cs): map should be immutable
-type DualModel
-    w::Vector      # weight vector of linear function
-    map::MercerMap # dual model is implemented via Mercer map
+# binomial regression
+
+type BinomialModel <: RegressionModel
+    f::RegressionFunction
+    theta::Vector            # parameter of regression function
 end
 
-predict(model::DualModel, X::Matrix)  = sign(apply(model.map, X)*model.w)
+predict(model::BinomialModel, X::AbstractMatrix) = sign(values(model, X))
 
-# Pretty-print
-function Base.show(io::IO, model::DualModel)
-    println(io, "Dual Model")
-    println(io, repeat("-", length("Dual Model")))
-    println(io, "number of dimensions: $(length(model.w))")
-    println(io, "number of examples:   $(size(model.map.K,1))")
-    println(io, "kernel function:      $(model.map.kernel)")
+# multinomial regression
+
+type MultinomialModel <: RegressionModel
+    f::RegressionFunction
+    theta::Vector    # k-1 stacked parameter vectors of regression function
+    k::Int           # number of classes
 end
+theta(model::MultinomialModel) = reshape(model.theta, length(model.theta) / (model.k-1), model, model.k-1)
+
+function values(model::MultinomialModel, X::AbstractMatrix, theta::AbstractVector=model.theta)
+    n = size(X, 1)
+    v = zeros(n, model.k-1)
+    m = length(theta)/(model.k-1)
+    for k = 1:model.k-1
+        v[:,k] = values(model.f, X, theta[(k-1)*m+1:k*m])
+    end
+    return v
+end
+predict(model::MultinomialModel, X::AbstractMatrix) = (v = values(model, X); n=size(X,1); [indmax([v[i,:] 0]) for i in 1:n])
+

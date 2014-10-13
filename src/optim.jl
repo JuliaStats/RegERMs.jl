@@ -25,13 +25,23 @@ end
 objective(method::RegERM, model::RegressionModel, λ::Float64, theta::AbstractVector) =
     tloss(loss(method), values(model, method.X, theta), method.y) + value(regularizer(method, theta, λ))
 
-function check_arguments(X::Matrix, y::Vector) 
+function check_arguments(X::Matrix, y::Vector, regression_type::Symbol)
     (n, m) = size(X)
     if (n != length(y))
         throw(DimensionMismatch("Dimensions of X and y mismatch."))
     end
-    if (sort(unique(y)) != [-1,1])
-        throw(ArgumentError("Class labels have to be either -1 or 1"))
+    if (regression_type == :binomial)
+        if (sort(unique(y)) != [-1,1])
+            throw(ArgumentError("Class labels have to be either -1 or 1"))
+        end
+    elseif (regression_type == :multinomial)
+        if (typeof(y) != Array{Int,1} || any(y.<1))
+            throw(ArgumentError("Classes have to be positive integer values"))
+        end
+    elseif (regression_type == :ordinal)
+        # something additional to check for regression?
+    else
+        throw(ArgumentError("Unknown regression_type=$(regression_type)"))
     end
 end
 

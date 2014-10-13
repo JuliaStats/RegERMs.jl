@@ -86,8 +86,6 @@ end
 type MultinomialLogisticLoss <: MultinomialLoss end
 
 value(::MultinomialLogisticLoss, fv::AbstractVector, y::Int) = log(1+sum(exp(fv)))-[fv, 0.0][y]
-
-# TODO(cs): rename to gradient
 deriv(l::MultinomialLogisticLoss, fv::Vector, y::Int) = exp(-value(l, fv, y))-(1:length(fv).==y)
 
 ## squared loss

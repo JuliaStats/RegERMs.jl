@@ -14,7 +14,7 @@ immutable BinomialLogReg <: LogReg
     regression_type::Symbol # ordinal, binomial, multinomial
 end
 function BinomialLogReg(X::Matrix, y::Vector; kernel::Symbol=:linear)
-    check_arguments(X, y)
+    check_arguments(X, y, :binomial)
     BinomialLogReg(X, y, size(X)..., kernel, :binomial)
 end
 
@@ -31,7 +31,7 @@ immutable MultinomialLogReg <: LogReg
     regression_type::Symbol # ordinal, binomial, multinomial
 end
 function MultinomialLogReg(X::Matrix, y::Vector; kernel::Symbol=:linear)
-    #check_arguments(X, y)
+    check_arguments(X, y, :multinomial)
     MultinomialLogReg(X, y, size(X)..., kernel, :multinomial)
 end
 

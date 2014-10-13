@@ -8,7 +8,7 @@ immutable RidgeReg <: RegERM
 end
 
 function RidgeReg(X::Matrix, y::Vector; kernel::Symbol=:linear)
-    check_arguments(X, y)
+    check_arguments(X, y, :ordinal)
     RidgeReg(X, y, size(X)..., kernel, :ordinal)
 end
 

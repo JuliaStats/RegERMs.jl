@@ -8,7 +8,7 @@ immutable SVM <: RegERM
 end
 
 function SVM(X::Matrix, y::Vector; kernel::Symbol=:linear)
-    check_arguments(X, y)
+    check_arguments(X, y, :binomial)
     SVM(X, y, size(X)..., kernel, :binomial)
 end
 

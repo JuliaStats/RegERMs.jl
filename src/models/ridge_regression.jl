@@ -8,9 +8,9 @@ immutable RidgeReg <: RegERM
     params::Hyperparameters # hyperparameters (e.g. λ)
 end
 
-function RidgeReg(X::Matrix, y::Vector; kernel::Symbol=:linear)
+function RidgeReg(X::Matrix, y::Vector; kernel::Symbol=:linear, λ::Float64=0.1)
     check_arguments(X, y, :ordinal)
-    RidgeReg(X, y, size(X)..., kernel, :ordinal)
+    RidgeReg(X, y, size(X)..., kernel, :ordinal, RegularizationParameters(λ))
 end
 
 methodname(::RidgeReg) = "Linear Regression"
@@ -27,6 +27,6 @@ function optimize(RidgeReg::RidgeReg; optimizer::Symbol=:closed_form)
         model.theta = (X'*X + eye(RidgeReg.m)/RidgeReg.params.λ)\X'*y
         model
     else
-        invoke(optimize, (RegERM, Float64, Symbol), RidgeReg, optimizer)
+        invoke(optimize, (RegERM, Symbol), RidgeReg, optimizer)
     end
 end

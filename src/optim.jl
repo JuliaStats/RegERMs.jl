@@ -3,7 +3,7 @@ abstract RegERM
 abstract RegressionSolver
 
 # FIX: could not use ``method`` as keyword directly due to ``invoke` in RidgeReg, see https://github.com/JuliaLang/julia/issues/7045
-optimize(method::RegERM, optimizer::Symbol=:l_bfgs) = optimize(method, optimizer)
+optimize(method::RegERM; optimizer::Symbol=:l_bfgs) = optimize(method, optimizer)
 
 function optimize(method::RegERM, optimizer::Symbol=:l_bfgs)
     check_hyperparameters(method.params)

@@ -54,7 +54,11 @@ export
     RegERM,                     # abstract type for learning models
     RegressionSolver,           # solver for regression problems
     objective,                  # evaluate the objective
-    optimize                    # optimize the objective
+    optimize,                   # optimize the objective
+
+    # hyperparameters
+    L1RDAParameters,
+    RegularizationParameters
 
 ## Source files
 
@@ -62,7 +66,7 @@ export
 include("loss.jl")
 include("regularizer.jl")
 include("mercer_map.jl")   ## TODO: need some discussion about the API for this
-include("hyperparameters.jl")
+include("models/hyperparameters.jl")
 include("regression_function.jl")
 include("model.jl")
 include("optim.jl")

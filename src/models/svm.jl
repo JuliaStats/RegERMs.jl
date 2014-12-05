@@ -8,9 +8,15 @@ immutable SVM <: RegERM
     params::Hyperparameters # hyperparameters (e.g. λ)
 end
 
-function SVM(X::Matrix, y::Vector; kernel::Symbol=:linear)
+function SVM(X::Matrix, y::Vector; kernel::Symbol=:linear, λ::Float64=0.1)
     check_arguments(X, y, :binomial)
-    SVM(X, y, size(X)..., kernel, :binomial)
+    SVM(X, y, size(X)..., kernel, :binomial, RegularizationParameters(λ))
+end
+
+function SVM(X::Matrix, y::Vector, params::Hyperparameters; kernel::Symbol=:linear)
+    check_hyperparameters(params)
+    check_arguments(X, y, :binomial)
+    SVM(X, y, size(X)..., kernel, :binomial, params)
 end
 
 methodname(::SVM) = "Support Vector Machine"

@@ -3,27 +3,25 @@ abstract RegERM
 abstract RegressionSolver
 
 # FIX: could not use ``method`` as keyword directly due to ``invoke` in RidgeReg, see https://github.com/JuliaLang/julia/issues/7045
-optimize(method::RegERM, λ::Float64; optimizer::Symbol=:l_bfgs) = optimize(method, λ, optimizer)
-function optimize(method::RegERM, λ::Float64, optimizer::Symbol=:l_bfgs)
-    if (λ <= 0)
-        throw(ArgumentError("Regularization parameter has to be positive"))
-    end
+optimize(method::RegERM, optimizer::Symbol=:l_bfgs) = optimize(method, optimizer)
+
+function optimize(method::RegERM, optimizer::Symbol=:l_bfgs)
+    check_hyperparameters(method.params)
 
     # init model
     model = Model(method.X, method.y, method.regression_type, method.kernel)
 
     if optimizer == :sgd
-        model.theta = solve(model, method, SGDSolver(), method.X, method.y, λ)
+        model.theta = solve(model, method, SGDSolver(), method.X, method.y)
+    elseif optimizer == :l1_rda && typeof(method.params) == L1RDAParameters
+        model.theta = solve(model, method, L1RDASolver(), method.X, method.y)
     elseif optimizer == :l_bfgs
-        model.theta = solve(model, method, LBFGSSolver(), method.X, method.y, λ)
+        model.theta = solve(model, method, LBFGSSolver(), method.X, method.y)
     else
-        throw(ArgumentError("Unknown optimizer=$(optimizer)"))
+        throw(ArgumentError("Unknown optimizer=$(optimizer) or mismatched hyperparameters"))
     end
     model
 end
-
-objective(method::RegERM, model::RegressionModel, λ::Float64, theta::AbstractVector) =
-    tloss(loss(method), values(model, method.X, theta), method.y) + value(regularizer(method, theta, λ))
 
 function check_arguments(X::Matrix, y::Vector, regression_type::Symbol)
     (n, m) = size(X)

@@ -5,6 +5,7 @@ immutable SVM <: RegERM
     m::Int                  # number of features
     kernel::Symbol          # kernel function
     regression_type::Symbol # ordinal, binomial, multinomial
+    params::Hyperparameters # hyperparameters (e.g. λ)
 end
 
 function SVM(X::Matrix, y::Vector; kernel::Symbol=:linear)
@@ -14,4 +15,4 @@ end
 
 methodname(::SVM) = "Support Vector Machine"
 loss(::SVM) = HingeLoss()
-regularizer(::SVM, w::Vector, λ::Float64) = L2reg(w, λ)
+regularizer(SVM::SVM, w::Vector) = L2reg(w, SVM.params.λ)

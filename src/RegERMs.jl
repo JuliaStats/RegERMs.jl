@@ -62,6 +62,7 @@ export
 include("loss.jl")
 include("regularizer.jl")
 include("mercer_map.jl")   ## TODO: need some discussion about the API for this
+include("hyperparameters.jl")
 include("regression_function.jl")
 include("model.jl")
 include("optim.jl")
@@ -73,6 +74,7 @@ include("models/logistic_regression.jl")
 include("models/ridge_regression.jl")
 # solver
 include("solvers/sgd.jl")
+include("solvers/l1rda.jl")
 include("solvers/lbfgs.jl")
 
 end # module

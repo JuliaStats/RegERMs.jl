@@ -1,14 +1,13 @@
 type SGDSolver <: RegressionSolver end
 
-# TODO: λ should be a part of the regularizer and be handled at the model level (e.g., via automatic cross-validation if not provided)
-function solve(model::RegressionModel, method::RegERM, ::SGDSolver, X::AbstractMatrix, y::AbstractVector, λ::Float64)
+function solve(model::RegressionModel, method::RegERM, ::SGDSolver, X::AbstractMatrix, y::AbstractVector)
     function loss_grad(theta::Vector, i::Int)
         grad_model = gradient(model.f, X[i,:], theta)
         grad_loss = derivs(loss(method), values(model, X[i,:], theta), [y[i]])
         vec(broadcast(*, grad_loss',grad_model))
     end
 
-    reg_grad(theta::Vector) = gradient(regularizer(method, theta, λ)) / method.n
+    reg_grad(theta::Vector) = gradient(regularizer(method, theta)) / method.n
     grad(theta::Vector, i::Int) = loss_grad(theta, i) + reg_grad(theta)
 
     sgd(grad, method.n, model.theta)

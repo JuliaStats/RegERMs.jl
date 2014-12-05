@@ -5,6 +5,7 @@ immutable RidgeReg <: RegERM
     m::Int                  # number of features
     kernel::Symbol          # kernel function
     regression_type::Symbol # ordinal, binomial, multinomial
+    params::Hyperparameters # hyperparameters (e.g. λ)
 end
 
 function RidgeReg(X::Matrix, y::Vector; kernel::Symbol=:linear)
@@ -14,20 +15,18 @@ end
 
 methodname(::RidgeReg) = "Linear Regression"
 loss(::RidgeReg) = SquaredLoss()
-regularizer(::RidgeReg, w::Vector, λ::Float64) = L2reg(w, λ)
+regularizer(RidgeReg::RidgeReg, w::Vector) = L2reg(w, RidgeReg.params.λ)
 
 # closed-form solution
-function optimize(RidgeReg::RidgeReg, λ::Float64; optimizer::Symbol=:closed_form)
-    if (λ <= 0)
-        throw(ArgumentError("Regularization parameter has to be positive"))
-    end
+function optimize(RidgeReg::RidgeReg; optimizer::Symbol=:closed_form)
+    check_hyperparameters(RidgeReg.params)
     
     if optimizer == :closed_form
         y, X = RidgeReg.y, RidgeReg.X
         model = Model(X, y, RidgeReg.regression_type, RidgeReg.kernel)
-        model.theta = (X'*X + eye(RidgeReg.m)/λ)\X'*y
+        model.theta = (X'*X + eye(RidgeReg.m)/RidgeReg.params.λ)\X'*y
         model
     else
-        invoke(optimize, (RegERM, Float64, Symbol), RidgeReg, λ, optimizer)
+        invoke(optimize, (RegERM, Float64, Symbol), RidgeReg, optimizer)
     end
 end

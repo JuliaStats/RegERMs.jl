@@ -24,3 +24,6 @@ show(IOBuffer(), SVM(X, y))
 
 @test_throws DimensionMismatch SVM(X', y) 
 @test_throws ArgumentError SVM(X, [3; 3; 2])
+@test_throws ArgumentError optimize(SVM(X, y, L1RDAParameters(-0.1,1.0,1.0)), optimizer=:l1_rda)
+@test_throws ArgumentError optimize(SVM(X, y, L1RDAParameters(0.1,-1.0,1.0)), optimizer=:l1_rda)
+@test_throws ArgumentError optimize(SVM(X, y, L1RDAParameters(0.1,1.0,-1.0)), optimizer=:l1_rda)

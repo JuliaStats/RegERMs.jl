@@ -20,12 +20,11 @@ X = [randn(int(np/2),1)+1 randn(int(np/2),1)+1; randn(int(np/2-0.5),1)-1 randn(i
      randn(int(nn/2),1)+1 randn(int(nn/2),1)-1; randn(int(nn/2-0.5),1)-1 randn(int(nn/2-0.5),1)+1] # examples with 2 features
 y = vec([ones(np,1); -ones(nn,1)])       # binary class values
 
-# choose SVM as learning algorithm
-svm = SVM(X, y; kernel=:rbf)
+# choose linear SVM as learning algorithm with regularization parameter 0.1
+svm = SVM(X, y; λ=0.1)
 
-# get solution (regularization parameter is 0.1)
-regParam = 0.1
-model = optimize(svm, regParam)
+# get a solution 
+model = optimize(svm)
 
 # make predictions and compute accuracy
 ybar = predict(model, X)

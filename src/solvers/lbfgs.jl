@@ -1,8 +1,6 @@
 type LBFGSSolver <: RegressionSolver end
 
-# TODO: λ should be a part of the regularizer and be handled at the model level (e.g., via automatic cross-validation if not provided)
-
-function solve(model::RegressionModel, method::RegERM, ::LBFGSSolver, X::AbstractMatrix, y::AbstractVector, λ::Float64)
+function solve(model::RegressionModel, method::RegERM, ::LBFGSSolver, X::AbstractMatrix, y::AbstractVector)
     function tloss_grad(theta::Vector)
       n = size(X,1)
 
@@ -19,8 +17,8 @@ function solve(model::RegressionModel, method::RegERM, ::LBFGSSolver, X::Abstrac
       return vec(total)
     end
 
-    reg_grad(theta::Vector) = gradient(regularizer(method, theta, λ))
-    obj(theta::Vector) = objective(method, model, λ, theta)
+    reg_grad(theta::Vector) = gradient(regularizer(method, theta))
+    obj(theta::Vector) = tloss(loss(method), values(model, method.X, theta), method.y) + value(regularizer(method, theta))
     grad!(theta::Vector, storage::Vector) = storage[:] = tloss_grad(theta) + reg_grad(theta)
 
     Optim.optimize(obj, grad!, model.theta, method=:l_bfgs, linesearch! = Optim.interpolating_linesearch!).minimum

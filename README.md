@@ -18,9 +18,13 @@ np = 100
 nn = 100
 X = [randn(int(np/2),1)+1 randn(int(np/2),1)+1; randn(int(np/2-0.5),1)-1 randn(int(np/2-0.5),1)-1;
      randn(int(nn/2),1)+1 randn(int(nn/2),1)-1; randn(int(nn/2-0.5),1)-1 randn(int(nn/2-0.5),1)+1] # examples with 2 features
-y = vec([ones(np,1); -ones(nn,1)])       # binary class values
+y = int(vec([ones(np,1); -ones(nn,1)]))       # binary class values
 
-# choose linear SVM as learning algorithm with regularization parameter 0.1
+# use rbf kernel by using mercer map
+map = MercerMap(X, :rbf)
+X = RegERMs.apply(map)
+
+# choose (linear) SVM as learning algorithm with regularization parameter 0.1
 svm = SVM(X, y; λ=0.1)
 
 # get a solution 

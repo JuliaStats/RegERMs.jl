@@ -28,7 +28,7 @@ for loss in binomialLosses
     println(loss)
 
     # check values
-    @test_approx_eq_eps values(loss, fv, y) expected_values(loss) eps
+    @test_approx_eq_eps RegERMs.values(loss, fv, y) expected_values(loss) eps
     for i in 1:3
         @test_approx_eq_eps value(loss, fv[i], y[i]) expected_values(loss)[i] eps
     end
@@ -47,14 +47,14 @@ for loss in binomialLosses
 end
 
 # multinomial version for k=2 should be identical to binomial loss
-fv_mul, y_mul = fv'', int((-y+3)/2)
+fv_mul, y_mul = fv'', round(Int, (-y+3)/2)
 for loss in multinomialLosses
     loss = multinomialLosses[1]
     print(" - ")
     println(loss)
 
     # check values
-    @test_approx_eq_eps values(loss, fv_mul, y_mul) expected_values(loss) eps
+    @test_approx_eq_eps RegERMs.values(loss, fv_mul, y_mul) expected_values(loss) eps
     for i in 1:3
         @test_approx_eq_eps value(loss, vec(fv_mul[i,:]), y_mul[i]) expected_values(loss)[i] eps
     end

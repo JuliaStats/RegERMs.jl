@@ -15,7 +15,7 @@ map = MercerMap(X, :rbf)
 @test_approx_eq_eps map.K K_centered 1e-6
 @test_approx_eq_eps map.d d 1e-6
 @test_approx_eq_eps map.V V 1e-6
-@test_approx_eq_eps apply(map) X_mapped 1e-6
+@test_approx_eq_eps RegERMs.apply(map) X_mapped 1e-6
 
 X = [1 1; 0 0;  -1 -1]
 XT = rand(100,2)
@@ -27,5 +27,5 @@ map = MercerMap(X, :linear)
 @test_approx_eq_eps map.K linear(X,X) 1e-6 # kernel is already centered
 @test_approx_eq_eps map.d d 1e-6
 @test_approx_eq_eps map.V V 1e-6
-@test_approx_eq_eps apply(map, X) X_mapped 1e-6
-apply(map, XT)
+@test_approx_eq_eps RegERMs.apply(map, X) X_mapped 1e-6
+RegERMs.apply(map, XT)

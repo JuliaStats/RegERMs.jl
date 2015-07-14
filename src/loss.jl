@@ -85,7 +85,7 @@ end
 # see http://en.wikipedia.org/wiki/Multinomial_logistic_regression#As_a_set_of_independent_binary_regressions
 type MultinomialLogisticLoss <: MultinomialLoss end
 
-value(::MultinomialLogisticLoss, fv::AbstractVector, y::Int) = log(1+sum(exp(fv)))-[fv, 0.0][y]
+value(::MultinomialLogisticLoss, fv::AbstractVector, y::Int) = log(1+sum(exp(fv)))-[fv; 0.0][y]
 deriv(l::MultinomialLogisticLoss, fv::Vector, y::Int) = exp(-value(l, fv, y))-(1:length(fv).==y)
 
 ## squared loss

@@ -63,7 +63,7 @@ theta(model::MultinomialModel) = reshape(model.theta, length(model.theta) / (mod
 function values(model::MultinomialModel, X::AbstractMatrix, theta::AbstractVector=model.theta)
     n = size(X, 1)
     v = zeros(n, model.k-1)
-    m = length(theta)/(model.k-1)
+    m = round(Int, length(theta)/(model.k-1))
     for k = 1:model.k-1
         v[:,k] = values(model.f, X, theta[(k-1)*m+1:k*m])
     end

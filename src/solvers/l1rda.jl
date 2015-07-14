@@ -21,7 +21,7 @@ function solve(model::RegressionModel,
 
     for t=1:iterations
         λ_rda = λ+(ρ*γ)/sqrt(t)
-        idx = int(ceil(N*rand(k)))
+        idx = round(Int, ceil(N*rand(k)))
 
         eval = (X[idx,:]*w).*y[idx]
         grad = map(i->loss_grad(w,i), idx[find(eval .< 1)])

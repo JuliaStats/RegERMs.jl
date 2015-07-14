@@ -13,6 +13,8 @@ This package implements several machine learning algorithms in a regularised emp
 Some examples:
 
 ```julia
+using RegERMs
+
 # define some toy data (XOR - example)
 np = 100
 nn = 100

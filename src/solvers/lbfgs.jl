@@ -24,6 +24,5 @@ function solve(model::RegressionModel, method::RegERM, ::LBFGSSolver, X::Abstrac
 
     Optim.optimize(obj, grad!,
                    model.theta,
-                   method=LBFGS(),
-                   OptimizationOptions(linesearch! = Optim.interpolating_linesearch!)).minimum
+                   method=LBFGS(; linesearch! = Optim.interpolating_linesearch!)).minimum
 end

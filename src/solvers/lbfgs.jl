@@ -4,7 +4,7 @@ function solve(model::RegressionModel, method::RegERM, ::LBFGSSolver, X::Abstrac
     function tloss_grad(theta::Vector)
         n = size(X,1)
 
-        grad_model = gradient(model.f, X[1,:], theta)
+        grad_model = gradient(model.f, X[1:1,:], theta)
         grad_loss = derivs(loss(method), values(model, X[1,:], theta), [y[1]])
 
         total = broadcast(*, grad_loss',grad_model)
@@ -12,7 +12,7 @@ function solve(model::RegressionModel, method::RegERM, ::LBFGSSolver, X::Abstrac
             grad_model = gradient(model.f, X[i,:], theta)
             grad_loss = derivs(loss(method), values(model, X[i,:], theta), [y[i]])
 
-            total += broadcast(*, grad_loss',grad_model)
+            total += broadcast(*, grad_loss', grad_model)
         end
         return vec(total)
     end
